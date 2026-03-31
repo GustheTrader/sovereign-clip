@@ -3,18 +3,10 @@ import {
   asString,
   asNumber,
   asBoolean,
-  buildPaperclipEnv,
+  parseObject,
   joinPromptSections,
-  runChildProcess,
+  buildPaperclipEnv,
 } from "@sovereign-clip/adapter-utils/server-utils";
-
-interface AgentsZeroExecutionInput {
-  runId: string;
-  agent: AdapterExecutionContext["agent"];
-  config: Record<string, unknown>;
-  context: Record<string, unknown>;
-  authToken?: string;
-}
 
 /**
  * Execute a task via the Agents Zero HTTP API.
@@ -22,23 +14,23 @@ interface AgentsZeroExecutionInput {
  * tools dynamically and self-corrects. It runs as a Python service.
  */
 export async function execute(
-  input: AgentsZeroExecutionInput,
+  ctx: AdapterExecutionContext,
 ): Promise<AdapterExecutionResult> {
-  const config = input.config;
-  const baseUrl = asString(config.baseUrl) || "http://localhost:5000";
-  const timeoutSec = asNumber(config.timeoutSec) || 300;
-  const agentProfile = asString(config.agentProfile) || "default";
-  const maxIterations = asNumber(config.maxIterations) || 50;
-  const enableBrowser = asBoolean(config.enableBrowser) ?? true;
-  const enableCodeExecution = asBoolean(config.enableCodeExecution) ?? true;
+  const config = ctx.config;
+  const baseUrl = asString(config.baseUrl, "http://localhost:5000");
+  const timeoutSec = asNumber(config.timeoutSec, 300);
+  const agentProfile = asString(config.agentProfile, "default");
+  const maxIterations = asNumber(config.maxIterations, 50);
+  const enableBrowser = asBoolean(config.enableBrowser, true);
+  const enableCodeExecution = asBoolean(config.enableCodeExecution, true);
 
-  const paperclipEnv = buildPaperclipEnv(input.context, input.runId);
+  const paperclipEnv = buildPaperclipEnv(ctx.agent);
 
   const prompt = joinPromptSections([
-    input.context.goal as string,
-    input.context.taskTitle as string,
-    input.context.taskDescription as string,
-    input.context.instructions as string,
+    ctx.context.goal as string,
+    ctx.context.taskTitle as string,
+    ctx.context.taskDescription as string,
+    ctx.context.instructions as string,
   ]);
 
   const requestBody = {
@@ -47,70 +39,77 @@ export async function execute(
     max_iterations: maxIterations,
     enable_browser: enableBrowser,
     enable_code_execution: enableCodeExecution,
+    stream: true,
     metadata: {
-      runId: input.runId,
+      runId: ctx.runId,
       paperclip: paperclipEnv,
     },
   };
 
+  let errorMessage: string | null = null;
+  let errorCode: string | null = null;
+
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutSec * 1000);
+
     const response = await fetch(`${baseUrl}/api/v1/agent/run`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(input.authToken ? { Authorization: `Bearer ${input.authToken}` } : {}),
+        ...(ctx.authToken ? { Authorization: `Bearer ${ctx.authToken}` } : {}),
       },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(timeoutSec * 1000),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeout);
 
     if (!response.ok) {
       const errorText = await response.text();
-      return {
-        status: "error",
-        error: `Agents Zero API returned ${response.status}: ${errorText}`,
-      };
+      errorMessage = `Agents Zero API returned ${response.status}: ${errorText}`;
+      errorCode = "api_error";
+    } else if (response.body) {
+      // Stream JSON-lines response
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.trim()) {
+            await ctx.onLog("stdout", line + "\n");
+          }
+        }
+      }
+
+      // Flush remaining buffer
+      if (buffer.trim()) {
+        await ctx.onLog("stdout", buffer + "\n");
+      }
     }
-
-    const result = await response.json();
-
-    return {
-      status: result.status === "success" ? "done" : "error",
-      output: result.output || result.response || "",
-      error: result.error,
-      meta: {
-        iterations: result.iterations,
-        toolsCreated: result.tools_created,
-        cost: result.cost,
-      },
-    };
-  } catch (error: any) {
-    return {
-      status: "error",
-      error: `Agents Zero execution failed: ${error.message}`,
-    };
-  }
-}
-
-/**
- * Test connectivity to the Agents Zero API.
- */
-export async function test(
-  config: Record<string, unknown>,
-): Promise<{ ok: boolean; message: string }> {
-  const baseUrl = asString(config.baseUrl) || "http://localhost:5000";
-
-  try {
-    const response = await fetch(`${baseUrl}/api/v1/health`, {
-      method: "GET",
-      signal: AbortSignal.timeout(5000),
-    });
-
-    if (response.ok) {
-      return { ok: true, message: "Agents Zero API is reachable" };
+  } catch (err: any) {
+    if (err.name === "AbortError") {
+      errorMessage = `Timed out after ${timeoutSec}s`;
+      errorCode = "timeout";
+    } else {
+      errorMessage = `Agents Zero execution failed: ${err.message}`;
+      errorCode = "connection_error";
     }
-    return { ok: false, message: `Agents Zero API returned ${response.status}` };
-  } catch (error: any) {
-    return { ok: false, message: `Cannot reach Agents Zero API: ${error.message}` };
   }
+
+  return {
+    exitCode: errorCode ? 1 : 0,
+    signal: null,
+    timedOut: errorCode === "timeout",
+    errorMessage,
+    errorCode,
+  };
 }

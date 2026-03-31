@@ -48,7 +48,7 @@ export async function testEnvironment(
   }
 
   // Check provider config
-  const provider = asString(config.provider);
+  const provider = asString(config.provider, "");
   if (provider) {
     checks.push({
       code: "nullclaw_provider_set",
@@ -102,7 +102,7 @@ export async function testEnvironment(
   });
 
   // Check edge deployment config
-  const targetHost = asString(config.targetHost);
+  const targetHost = asString(config.targetHost, "");
   if (targetHost) {
     checks.push({
       code: "nullclaw_edge_target",
@@ -131,7 +131,7 @@ export async function testEnvironment(
   }
 
   // Check config file
-  const configPath = asString(config.configPath);
+  const configPath = asString(config.configPath, "");
   if (configPath) {
     checks.push({
       code: "nullclaw_config_set",

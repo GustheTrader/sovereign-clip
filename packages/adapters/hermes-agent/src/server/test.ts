@@ -99,7 +99,7 @@ export async function testEnvironment(
   }
 
   // Check model provider config
-  const modelProvider = asString(config.modelProvider);
+  const modelProvider = asString(config.modelProvider, "");
   if (modelProvider) {
     checks.push({
       code: "hermes_provider_set",
@@ -115,7 +115,7 @@ export async function testEnvironment(
   }
 
   // Check hermes home / memory directory
-  const hermesHome = asString(config.hermesHome);
+  const hermesHome = asString(config.hermesHome, "");
   if (hermesHome) {
     checks.push({
       code: "hermes_home_set",

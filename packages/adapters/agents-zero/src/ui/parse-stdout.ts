@@ -26,7 +26,6 @@ export function parseAgentsZeroStdoutLine(line: string, ts: string): TranscriptE
   const record = asRecord(parsed);
 
   if (!record) {
-    // Plain text output
     if (line.trim().length > 0) {
       return [{ kind: "stdout", ts, text: line.trim() }];
     }
@@ -45,30 +44,39 @@ export function parseAgentsZeroStdoutLine(line: string, ts: string): TranscriptE
     case "tool_call": {
       const toolName = asString(record.tool || record.name);
       return [{
-        kind: "tool",
+        kind: "tool_call",
         ts,
-        text: toolName ? `[${toolName}] ${content}` : content,
+        name: toolName,
+        input: record.input || record.args || {},
+        toolUseId: asString(record.tool_use_id),
       }];
     }
 
     case "tool_result":
-      return [{ kind: "tool_result", ts, text: content }];
+      return [{
+        kind: "tool_result",
+        ts,
+        toolUseId: asString(record.tool_use_id),
+        toolName: asString(record.tool),
+        content,
+        isError: false,
+      }];
 
     case "thinking":
     case "reasoning":
       return [{ kind: "thinking", ts, text: content }];
 
     case "error":
-      return [{ kind: "error", ts, text: content }];
+      return [{ kind: "stderr", ts, text: content }];
 
     case "iteration":
-      return [{ kind: "info", ts, text: `Iteration ${record.iteration}: ${content}` }];
+      return [{ kind: "system", ts, text: `Iteration ${record.iteration}: ${content}` }];
 
     case "tool_created":
-      return [{ kind: "info", ts, text: `🔧 Created tool: ${asString(record.tool_name)}` }];
+      return [{ kind: "system", ts, text: `Created tool: ${asString(record.tool_name)}` }];
 
     case "status":
-      return [{ kind: "info", ts, text: content }];
+      return [{ kind: "system", ts, text: content }];
 
     default:
       if (content) {

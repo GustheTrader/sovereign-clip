@@ -44,55 +44,58 @@ export function parseHermesStdoutLine(line: string, ts: string): TranscriptEntry
     case "function_call": {
       const fnName = asString(record.function || record.name);
       return [{
-        kind: "tool",
+        kind: "tool_call",
         ts,
-        text: fnName ? `[${fnName}] ${content}` : content,
+        name: fnName,
+        input: record.input || record.args || {},
+        toolUseId: asString(record.tool_use_id),
       }];
     }
 
     case "tool_result":
     case "function_result":
-      return [{ kind: "tool_result", ts, text: content }];
+      return [{
+        kind: "tool_result",
+        ts,
+        toolUseId: asString(record.tool_use_id),
+        toolName: asString(record.function || record.name),
+        content,
+        isError: false,
+      }];
 
     case "thinking":
     case "reasoning":
       return [{ kind: "thinking", ts, text: content }];
 
     case "memory_update":
-    case "memory_store": {
-      const memoryKey = asString(record.key || record.memory_key);
+    case "memory_store":
       return [{
-        kind: "info",
+        kind: "system",
         ts,
-        text: `🧠 Memory updated${memoryKey ? `: ${memoryKey}` : ""}`,
+        text: `Memory updated: ${asString(record.key || record.memory_key)}`,
       }];
-    }
 
     case "skill_learned":
-    case "skill_created": {
-      const skillName = asString(record.skill || record.skill_name);
+    case "skill_created":
       return [{
-        kind: "info",
+        kind: "system",
         ts,
-        text: `🎯 Skill learned${skillName ? `: ${skillName}` : ""}`,
+        text: `Skill learned: ${asString(record.skill || record.skill_name)}`,
       }];
-    }
 
-    case "provider_switch": {
-      const provider = asString(record.provider);
+    case "provider_switch":
       return [{
-        kind: "info",
+        kind: "system",
         ts,
-        text: `🔄 Switched to provider: ${provider}`,
+        text: `Switched to provider: ${asString(record.provider)}`,
       }];
-    }
 
     case "error":
-      return [{ kind: "error", ts, text: content }];
+      return [{ kind: "stderr", ts, text: content }];
 
     case "status":
     case "info":
-      return [{ kind: "info", ts, text: content }];
+      return [{ kind: "system", ts, text: content }];
 
     default:
       if (content) {

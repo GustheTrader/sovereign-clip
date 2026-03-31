@@ -95,7 +95,7 @@ export async function testEnvironment(
   }
 
   // Check optional config
-  const agentProfile = asString(config.agentProfile);
+  const agentProfile = asString(config.agentProfile, "");
   if (agentProfile) {
     checks.push({
       code: "agents_zero_profile_set",
@@ -104,7 +104,7 @@ export async function testEnvironment(
     });
   }
 
-  const apiKey = asString(config.apiKey);
+  const apiKey = asString(config.apiKey, "");
   if (apiKey) {
     checks.push({
       code: "agents_zero_auth_present",

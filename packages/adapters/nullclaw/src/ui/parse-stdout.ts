@@ -33,7 +33,7 @@ export function parseNullClawStdoutLine(line: string, ts: string): TranscriptEnt
     return [];
   }
 
-  const type = asString(record.t || record.type); // NullClaw uses short keys
+  const type = asString(record.t || record.type);
   const content = asString(record.c || record.content || record.text);
 
   switch (type) {
@@ -45,31 +45,36 @@ export function parseNullClawStdoutLine(line: string, ts: string): TranscriptEnt
     case "tool": {
       const toolName = asString(record.n || record.name);
       return [{
-        kind: "tool",
+        kind: "tool_call",
         ts,
-        text: toolName ? `[${toolName}] ${content}` : content,
+        name: toolName,
+        input: record.input || {},
+        toolUseId: asString(record.id),
       }];
     }
 
     case "tr":
     case "tool_result":
-      return [{ kind: "tool_result", ts, text: content }];
+      return [{
+        kind: "tool_result",
+        ts,
+        toolUseId: asString(record.id || record.tool_use_id),
+        toolName: asString(record.n || record.name),
+        content,
+        isError: false,
+      }];
 
     case "e":
     case "error":
-      return [{ kind: "error", ts, text: content }];
+      return [{ kind: "stderr", ts, text: content }];
 
     case "i":
     case "info":
-      return [{ kind: "info", ts, text: content }];
-
     case "s":
     case "status":
-      return [{ kind: "info", ts, text: `⚡ ${content}` }];
-
     case "d":
     case "deploy":
-      return [{ kind: "info", ts, text: `📡 Deploy: ${content}` }];
+      return [{ kind: "system", ts, text: content }];
 
     default:
       if (content) {

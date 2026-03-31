@@ -7,7 +7,12 @@ const WHITE = "\x1b[37m";
 const YELLOW = "\x1b[33m";
 const RED = "\x1b[31m";
 const GREEN = "\x1b[32m";
-const CYAN = "\x1b[36m";
+
+function getText(entry: TranscriptEntry): string {
+  if ("text" in entry) return entry.text;
+  if ("content" in entry) return entry.content;
+  return "";
+}
 
 export function formatNullClawEvent(entry: TranscriptEntry): string {
   const ts = `${DIM}${entry.ts}${RESET}`;
@@ -15,19 +20,23 @@ export function formatNullClawEvent(entry: TranscriptEntry): string {
   switch (entry.kind) {
     case "assistant":
       return `${ts} ${BOLD}${WHITE}NullClaw${RESET} ${entry.text}`;
-    case "tool":
-      return `${ts} ${YELLOW}⚡ ${entry.text}${RESET}`;
+    case "tool_call":
+      return `${ts} ${YELLOW}⚡ [${entry.name}]${RESET}`;
     case "tool_result":
-      return `${ts} ${DIM}↳ ${entry.text}${RESET}`;
-    case "error":
+      return `${ts} ${DIM}↳ ${entry.content}${RESET}`;
+    case "stderr":
       return `${ts} ${RED}✗ ${entry.text}${RESET}`;
-    case "info":
-      if (entry.text?.includes("📡")) {
-        return `${ts} ${CYAN}${entry.text}${RESET}`;
-      }
+    case "system":
       return `${ts} ${GREEN}●${RESET} ${entry.text}`;
     case "stdout":
-    default:
       return `${ts} ${entry.text}`;
+    case "init":
+      return `${ts} ${DIM}Session started: ${entry.model}${RESET}`;
+    case "result":
+      return `${ts} ${GREEN}✓${RESET} ${entry.text} (${entry.inputTokens}→${entry.outputTokens} tokens)`;
+    case "user":
+      return `${ts} ${BOLD}User:${RESET} ${entry.text}`;
+    default:
+      return `${ts} ${getText(entry)}`;
   }
 }
