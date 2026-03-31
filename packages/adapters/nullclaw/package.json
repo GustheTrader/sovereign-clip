@@ -1,5 +1,5 @@
 {
-  "name": "@paperclipai/adapter-nullclaw",
+  "name": "@sovereign-clip/adapter-nullclaw",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@paperclipai/adapter-utils": "workspace:*"
+    "@sovereign-clip/adapter-utils": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

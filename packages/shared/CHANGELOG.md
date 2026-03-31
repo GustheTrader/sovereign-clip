@@ -1,4 +1,4 @@
-# @paperclipai/shared
+# @sovereign-clip/shared
 
 ## 0.3.1
 

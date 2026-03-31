@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
 import { and, desc, eq, gte, inArray, lt, ne, sql } from "drizzle-orm";
-import type { Db } from "@paperclipai/db";
+import type { Db } from "@sovereign-clip/db";
 import {
   agents,
   agentConfigRevisions,
@@ -11,8 +11,8 @@ import {
   costEvents,
   heartbeatRunEvents,
   heartbeatRuns,
-} from "@paperclipai/db";
-import { isUuidLike, normalizeAgentUrlKey } from "@paperclipai/shared";
+} from "@sovereign-clip/db";
+import { isUuidLike, normalizeAgentUrlKey } from "@sovereign-clip/shared";
 import { conflict, notFound, unprocessable } from "../errors.js";
 import { normalizeAgentPermissions } from "./agent-permissions.js";
 import { REDACTED_EVENT_VALUE, sanitizeRecord } from "../redaction.js";

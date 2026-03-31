@@ -55,7 +55,7 @@ OPENAI_API_KEY=... ANTHROPIC_API_KEY=... docker compose -f docker-compose.untrus
 Inside the container:
 
 ```sh
-review-checkout-pr paperclipai/paperclip 432
+review-checkout-pr sovereign-agentic-os/sovereign-clip 432
 cd /work/checkouts/paperclipai-paperclip/pr-432
 ```
 

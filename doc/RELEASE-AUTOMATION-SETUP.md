@@ -34,8 +34,8 @@ Do this for every public package that Paperclip publishes.
 At minimum that includes:
 
 - `paperclipai`
-- `@paperclipai/server`
-- `@paperclipai/ui`
+- `@sovereign-clip/server`
+- `@sovereign-clip/ui`
 - public packages under `packages/`
 
 ### 2.1. In npm, open each package settings page
@@ -44,7 +44,7 @@ For each package:
 
 1. open npm as an owner of the package
 2. go to the package settings / publishing access area
-3. add a trusted publisher for the GitHub repository `paperclipai/paperclip`
+3. add a trusted publisher for the GitHub repository `sovereign-agentic-os/sovereign-clip`
 
 ### 2.2. Add one trusted publisher entry per package
 
@@ -56,7 +56,7 @@ Configure:
 
 Repository:
 
-- `paperclipai/paperclip`
+- `sovereign-agentic-os/sovereign-clip`
 
 Environment name:
 

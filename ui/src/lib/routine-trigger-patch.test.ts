@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { RoutineTrigger } from "@paperclipai/shared";
+import type { RoutineTrigger } from "@sovereign-clip/shared";
 import { buildRoutineTriggerPatch } from "./routine-trigger-patch";
 
 function makeScheduleTrigger(overrides: Partial<RoutineTrigger> = {}): RoutineTrigger {

@@ -1,4 +1,4 @@
-import type { CompanyPortabilityFileEntry } from "@paperclipai/shared";
+import type { CompanyPortabilityFileEntry } from "@sovereign-clip/shared";
 
 const contentTypeByExtension: Record<string, string> = {
   ".gif": "image/gif",

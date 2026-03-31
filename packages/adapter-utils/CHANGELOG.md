@@ -1,4 +1,4 @@
-# @paperclipai/adapter-utils
+# @sovereign-clip/adapter-utils
 
 ## 0.3.1
 

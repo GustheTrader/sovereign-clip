@@ -1,4 +1,4 @@
-import type { ExecutionWorkspace, ExecutionWorkspaceCloseReadiness, WorkspaceOperation } from "@paperclipai/shared";
+import type { ExecutionWorkspace, ExecutionWorkspaceCloseReadiness, WorkspaceOperation } from "@sovereign-clip/shared";
 import { api } from "./client";
 
 export const executionWorkspacesApi = {

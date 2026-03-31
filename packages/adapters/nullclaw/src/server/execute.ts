@@ -1,4 +1,4 @@
-import type { AdapterExecutionContext, AdapterExecutionResult } from "@paperclipai/adapter-utils";
+import type { AdapterExecutionContext, AdapterExecutionResult } from "@sovereign-clip/adapter-utils";
 import {
   asString,
   asNumber,
@@ -6,7 +6,7 @@ import {
   buildPaperclipEnv,
   joinPromptSections,
   runChildProcess,
-} from "@paperclipai/adapter-utils/server-utils";
+} from "@sovereign-clip/adapter-utils/server-utils";
 
 interface NullClawExecutionInput {
   runId: string;

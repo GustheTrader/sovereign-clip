@@ -1,7 +1,7 @@
 /**
  * Generates README.md with Mermaid org chart for company exports.
  */
-import type { CompanyPortabilityManifest } from "@paperclipai/shared";
+import type { CompanyPortabilityManifest } from "@sovereign-clip/shared";
 
 const ROLE_LABELS: Record<string, string> = {
   ceo: "CEO",
@@ -96,7 +96,7 @@ export function generateReadme(
   // What's Inside table
   lines.push("## What's Inside");
   lines.push("");
-  lines.push("> This is an [Agent Company](https://agentcompanies.io) package from [Paperclip](https://paperclip.ing)");
+  lines.push("> This is an [Agent Company](https://agentcompanies.io) package from [Paperclip](https://sovereignclip.ai)");
   lines.push("");
 
   const counts: Array<[string, number]> = [];
@@ -160,12 +160,12 @@ export function generateReadme(
   lines.push("pnpm paperclipai company import this-github-url-or-folder");
   lines.push("```");
   lines.push("");
-  lines.push("See [Paperclip](https://paperclip.ing) for more information.");
+  lines.push("See [Paperclip](https://sovereignclip.ai) for more information.");
   lines.push("");
 
   // Footer
   lines.push("---");
-  lines.push(`Exported from [Paperclip](https://paperclip.ing) on ${new Date().toISOString().split("T")[0]}`);
+  lines.push(`Exported from [Paperclip](https://sovereignclip.ai) on ${new Date().toISOString().split("T")[0]}`);
   lines.push("");
 
   return lines.join("\n");

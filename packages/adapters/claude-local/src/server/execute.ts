@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { AdapterExecutionContext, AdapterExecutionResult } from "@paperclipai/adapter-utils";
-import type { RunProcessResult } from "@paperclipai/adapter-utils/server-utils";
+import type { AdapterExecutionContext, AdapterExecutionResult } from "@sovereign-clip/adapter-utils";
+import type { RunProcessResult } from "@sovereign-clip/adapter-utils/server-utils";
 import {
   asString,
   asNumber,
@@ -21,7 +21,7 @@ import {
   resolveCommandForLogs,
   renderTemplate,
   runChildProcess,
-} from "@paperclipai/adapter-utils/server-utils";
+} from "@sovereign-clip/adapter-utils/server-utils";
 import {
   parseClaudeStreamJson,
   describeClaudeFailure,

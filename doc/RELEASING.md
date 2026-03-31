@@ -77,7 +77,7 @@ npx paperclipai@canary onboard --data-dir "$(mktemp -d /tmp/paperclip-canary.XXX
 
 Use [`.github/workflows/release.yml`](../.github/workflows/release.yml) from the Actions tab with the manual `workflow_dispatch` inputs.
 
-[Run the action here](https://github.com/paperclipai/paperclip/actions/workflows/release.yml)
+[Run the action here](https://github.com/sovereign-agentic-os/sovereign-clip/actions/workflows/release.yml)
 
 Inputs:
 

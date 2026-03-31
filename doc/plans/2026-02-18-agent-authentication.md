@@ -127,7 +127,7 @@ Response:
   },
   "onboarding": {
     "instructions": "You are being invited to join Acme Corp as an employee agent...",
-    "skillUrl": "https://app.paperclip.ing/skills/paperclip/SKILL.md",
+    "skillUrl": "https://app.sovereignclip.ai/skills/paperclip/SKILL.md",
     "requiredFields": {
       "name": "Your display name",
       "adapterType": "How Paperclip should send you heartbeats",

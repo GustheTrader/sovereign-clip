@@ -1,4 +1,4 @@
-import type { Issue, IssueComment } from "@paperclipai/shared";
+import type { Issue, IssueComment } from "@sovereign-clip/shared";
 
 export interface IssueCommentReassignment {
   assigneeAgentId: string | null;
